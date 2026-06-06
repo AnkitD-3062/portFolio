@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ankit — UI/UX & Frontend Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0d0d0d;
+    --ink-2: #2a2a2a;
+    --ink-3: #666;
+    --paper: #f5f2eb;
+    --paper-2: #ede9df;
+    --accent: #c8401e;
+    --accent-light: #f5d5cc;
+    --gold: #b8960c;
+    --line: rgba(13,13,13,0.12);
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --serif: 'Instrument Serif', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, width 0.2s, height 0.2s, background 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s cubic-bezier(.16,1,.3,1), opacity 0.2s;
+    transform: translate(-50%, -50%);
+    opacity: 0.4;
+  }
+  body:has(a:hover) .cursor { width: 20px; height: 20px; background: var(--ink); }
+  body:has(a:hover) .cursor-ring { opacity: 0; }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9000;
+    opacity: 0.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    mix-blend-mode: multiply;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 120px 48px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -52%);
+    font-size: clamp(120px, 18vw, 260px);
+    font-family: var(--serif);
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(13,13,13,0.07);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 60px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-name {
+    font-size: clamp(64px, 10vw, 140px);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+
+  .hero-name em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero-bio {
+    max-width: 480px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s forwards;
+    margin-bottom: 40px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.65s forwards;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--ink-3);
+    background: var(--paper-2);
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+
+  .hero-scroll {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--ink-3);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  .hero-github {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+  }
+  .hero-github:hover { color: var(--accent); }
+  .hero-github svg { width: 14px; height: 14px; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  /* PROJECTS */
+  #projects {
+    padding: 100px 48px;
+  }
+
+  .projects-grid {
+    display: grid;
+    gap: 2px;
+  }
+
+  .project-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .project-card:hover { background: var(--paper-2); }
+
+  .project-card-left {
+    padding: 40px;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 240px;
+  }
+
+  .project-card-right {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .project-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+  }
+
+  .project-name {
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  .project-name em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .project-tagline {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .project-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    margin-bottom: 24px;
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 1px;
+  }
+  .stack-tag.ts { background: #3178c6; }
+  .stack-tag.react { background: #087ea4; }
+  .stack-tag.css { background: #1572b6; }
+  .stack-tag.js { background: #b8960c; color: var(--ink); }
+  .stack-tag.next { background: var(--ink); }
+  .stack-tag.vite { background: #bd34fe; }
+  .stack-tag.tailwind { background: #0ea5e9; }
+
+  .project-links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-github {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 8px 18px;
+    border-radius: 2px;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-github:hover { background: var(--ink); color: var(--paper); }
+
+  .btn-live {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--accent);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--accent);
+    transition: opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-live:hover { opacity: 0.6; }
+
+  .project-arrow {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--line);
+    align-self: flex-end;
+    line-height: 1;
+    transition: color 0.3s, transform 0.3s;
+  }
+  .project-card:hover .project-arrow { color: var(--accent); transform: translate(4px, -4px); }
+
+  /* Highlight card */
+  .project-card.featured {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .project-card.featured .project-num { color: var(--accent); }
+  .project-card.featured .project-desc { color: rgba(245,242,235,0.65); }
+  .project-card.featured:hover { background: var(--ink-2); }
+  .project-card.featured .project-card-left { border-right-color: rgba(255,255,255,0.1); }
+  .project-card.featured .btn-github { color: var(--paper); border-color: rgba(255,255,255,0.3); }
+  .project-card.featured .btn-github:hover { background: var(--paper); color: var(--ink); }
+  .project-card.featured .tag { background: rgba(255,255,255,0.08); color: rgba(245,242,235,0.5); border-color: rgba(255,255,255,0.1); }
+  .project-card.featured .project-arrow { color: rgba(255,255,255,0.15); }
+
+  /* ABOUT */
+  #about {
+    padding: 100px 48px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  #about .section-title { color: var(--paper); }
+  #about .section-num { color: var(--accent); }
+  #about .section-header { border-bottom-color: rgba(255,255,255,0.1); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+
+  .about-statement {
+    font-size: clamp(20px, 2.5vw, 30px);
+    line-height: 1.45;
+    font-family: var(--serif);
+    font-style: italic;
+    color: rgba(245,242,235,0.85);
+  }
+
+  .about-statement strong {
+    font-style: normal;
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--paper);
+  }
+
+  .about-right { display: flex; flex-direction: column; gap: 32px; }
+
+  .about-row {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+  }
+
+  .about-row-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .about-row-val {
+    font-size: 14px;
+    color: rgba(245,242,235,0.7);
+    line-height: 1.6;
+  }
+
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .skill-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 1px;
+    color: rgba(245,242,235,0.65);
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 100px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .contact-headline {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+
+  .contact-headline em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .contact-links { display: flex; flex-direction: column; gap: 16px; }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    transition: gap 0.25s;
+  }
+  .contact-link:hover { gap: 24px; }
+  .contact-link:hover .cl-arrow { color: var(--accent); }
+
+  .cl-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    min-width: 80px;
+  }
+
+  .cl-val {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .cl-arrow {
+    margin-left: auto;
+    font-size: 20px;
+    transition: color 0.2s;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 24px 48px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+
+  .footer-made {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* scroll-reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in-view {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .hero { padding: 100px 24px 40px; }
+    .hero-bg-text { font-size: 80px; }
+    #projects, #about, #contact { padding: 60px 24px; }
+    .project-card, .project-card.featured { grid-template-columns: 1fr; }
+    .project-card-left { border-right: none; border-bottom: 1px solid var(--line); }
+    .project-card.featured .project-card-left { border-bottom-color: rgba(255,255,255,0.1); }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    #contact { grid-template-columns: 1fr; gap: 40px; }
+    footer { flex-direction: column; gap: 8px; text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="#" class="nav-logo">AnkitD-3062</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">Designer</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">UI/UX & Frontend — Kolkata, IN</p>
+    <h1 class="hero-name">Ankit<br><em>Dev.</em></h1>
+    <p class="hero-bio">I design products that look premium, think in data, and ship in code. Most designers can't analyze. Most analysts can't design. I do both — and use each to make the other better.</p>
+    <div class="hero-tags">
+      <span class="tag">UI/UX Design</span>
+      <span class="tag">Frontend Dev</span>
+      <span class="tag">Data Analysis</span>
+      <span class="tag">Typography</span>
+      <span class="tag">GFG Intern</span>
+      <span class="tag">B.Tech DS — Year 3</span>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      Scroll to explore
+    </div>
+    <a href="https://github.com/AnkitD-3062" target="_blank" class="hero-github">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub ↗
+    </a>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-num">01 / Projects</p>
+      <h2 class="section-title">Shipped work.</h2>
+    </div>
+    <a href="https://github.com/AnkitD-3062?tab=repositories" target="_blank" class="btn-github" style="font-size:10px;">All repos ↗</a>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- Aether Weather — FEATURED -->
+    <article class="project-card featured reveal">
+      <div class="project-card-left">
+        <div>
+          <p class="project-num">01 — Featured</p>
+          <h3 class="project-name">Aether<br><em>Weather</em></h3>
+          <p class="project-tagline">Cinematic weather experience</p>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+      <div class="project-card-right">
+        <p class="project-desc">A weather app treated as an atmosphere — not just a data card. Immersive city-based scenes with parallax motion, ambient audio, glassmorphism panels, and smooth transitions. Six cities, six visual moods: rain, storm, mist, clouds, sun, snow.</p>
+        <div>
+          <div class="project-stack">
+            <span class="stack-tag next">Next.js</span>
+            <span class="stack-tag ts">TypeScript</span>
+            <span class="stack-tag tailwind">Tailwind</span>
+            <span class="stack-tag react">Framer Motion</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/AnkitD-3062/Aether-Weather" target="_blank" class="btn-github">GitHub</a>
+            <a href="https://ankitd-3062.github.io/Aether-Weather/" target="_blank" class="btn-live">Live demo ↗</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Mood Music Player -->
+    <article class="project-card reveal">
+      <div class="project-card-left">
+        <div>
+          <p class="project-num">02</p>
+          <h3 class="project-name">Mood<br><em>Music</em></h3>
+          <p class="project-tagline">Emotion-reactive player</p>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+      <div class="project-card-right">
+        <p class="project-desc">A premium mood-reactive music player where emotional input drives playlist generation and transforms the entire UI — color, motion, layered glass panels all shift with your mood. Waveform visualizer, lyrics view, and mood history built in.</p>
+        <div>
+          <div class="project-stack">
+            <span class="stack-tag next">Next.js</span>
+            <span class="stack-tag ts">TypeScript</span>
+            <span class="stack-tag tailwind">Tailwind</span>
+            <span class="stack-tag react">React 19</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/AnkitD-3062/Mood-Based-Music-Player" target="_blank" class="btn-github">GitHub</a>
+            <a href="https://ankitd-3062.github.io/Mood-Based-Music-Player/" target="_blank" class="btn-live">Live demo ↗</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- SnapBooth -->
+    <article class="project-card reveal">
+      <div class="project-card-left">
+        <div>
+          <p class="project-num">03</p>
+          <h3 class="project-name">Snap<br><em>Booth</em></h3>
+          <p class="project-tagline">Browser-based photo booth</p>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+      <div class="project-card-right">
+        <p class="project-desc">A lightweight browser studio — open the camera, trigger a four-shot countdown, choose a mood filter, and export a polished photo strip. Fully client-side with no backend, responsive on desktop and mobile.</p>
+        <div>
+          <div class="project-stack">
+            <span class="stack-tag react">React 18</span>
+            <span class="stack-tag vite">Vite</span>
+            <span class="stack-tag css">CSS Modules</span>
+            <span class="stack-tag js">JS</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/AnkitD-3062/snapbooth" target="_blank" class="btn-github">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- CoffeeShop -->
+    <article class="project-card reveal">
+      <div class="project-card-left">
+        <div>
+          <p class="project-num">04</p>
+          <h3 class="project-name">Ms<em>Cafe</em></h3>
+          <p class="project-tagline">Coffee shop web app</p>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+      <div class="project-card-right">
+        <p class="project-desc">An elegant, fully responsive coffee shop web app with a curated menu, sustainability sourcing story, and React Context-powered state. 68 commits of iterative refinement — the kind of commitment that shows in the details.</p>
+        <div>
+          <div class="project-stack">
+            <span class="stack-tag react">React</span>
+            <span class="stack-tag js">JavaScript</span>
+            <span class="stack-tag css">CSS</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/AnkitD-3062/CoffeeShop" target="_blank" class="btn-github">GitHub</a>
+            <a href="https://coffee-shop-teal.vercel.app/" target="_blank" class="btn-live">Live ↗</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-num">02 / About</p>
+      <h2 class="section-title">The triple threat.</h2>
+    </div>
+  </div>
+  <div class="about-grid">
+    <div class="reveal">
+      <p class="about-statement">
+        Most designers can't analyze. Most analysts can't design. Most developers don't think about experience.<br><br>
+        <strong>I do all three — and use each to make the others better.</strong>
+      </p>
+    </div>
+    <div class="about-right reveal">
+      <div class="about-row">
+        <p class="about-row-label">Current role</p>
+        <p class="about-row-val">Junior Data Analyst Intern @ GeeksforGeeks</p>
+      </div>
+      <div class="about-row">
+        <p class="about-row-label">Education</p>
+        <p class="about-row-val">B.Tech Data Science — Year 3<br>IIT Delhi Hackathon — Top 30</p>
+      </div>
+      <div class="about-row">
+        <p class="about-row-label">Product shipped</p>
+        <p class="about-row-val">JobPair AI — AI career optimization platform, deployed on Vercel</p>
+      </div>
+      <div class="about-row">
+        <p class="about-row-label">Design superpower</p>
+        <p class="about-row-val">Typography & visual craft. Hierarchy, clarity, polished UI.</p>
+      </div>
+      <div class="about-row">
+        <p class="about-row-label">Stack</p>
+        <div class="skills-list">
+          <span class="skill-pill">Figma</span>
+          <span class="skill-pill">React</span>
+          <span class="skill-pill">Next.js</span>
+          <span class="skill-pill">TypeScript</span>
+          <span class="skill-pill">Tailwind</span>
+          <span class="skill-pill">Framer Motion</span>
+          <span class="skill-pill">SQL</span>
+          <span class="skill-pill">Python</span>
+          <span class="skill-pill">Excel</span>
+          <span class="skill-pill">Three.js</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="reveal">
+    <h2 class="contact-headline">Let's build<br>something<br><em>great.</em></h2>
+  </div>
+  <div class="contact-links reveal">
+    <a href="https://github.com/AnkitD-3062" target="_blank" class="contact-link">
+      <span class="cl-label">GitHub</span>
+      <span class="cl-val">AnkitD-3062</span>
+      <span class="cl-arrow">↗</span>
+    </a>
+    <a href="mailto:deyankit3062@gmail.com" class="contact-link">
+      <span class="cl-label">Email</span>
+      <span class="cl-val">deyankit3062@gmail.com</span>
+      <span class="cl-arrow">→</span>
+    </a>
+    <div class="contact-link" style="cursor:default;">
+      <span class="cl-label">Location</span>
+      <span class="cl-val">Kolkata, West Bengal, India</span>
+    </div>
+    <div class="contact-link" style="cursor:default; border-bottom:none;">
+      <span class="cl-label">Status</span>
+      <span class="cl-val" style="color:#2a8a3e; font-weight:600;">● Open to internships & freelance</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="footer-copy">© 2026 Ankit Dev — All projects built and shipped.</p>
+  <p class="footer-made">AnkitD-3062 · UI/UX & Frontend · Data Science</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in-view'), i * 80);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => io.observe(r));
+</script>
+
+</body>
+</html>
